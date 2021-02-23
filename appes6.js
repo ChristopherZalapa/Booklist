@@ -55,3 +55,32 @@ class UI {
     }
 }
 
+// Event Listener To Add Book
+document.getElementById('book-form').addEventListener('submit', function(e) {
+    // Get Form Values
+    const title = document.getElementById('title').value,
+            author = document.getElementById('author').value,
+            isbn = document.getElementById('isbn').value
+    
+    // Instantiate Book
+    const book = new Book(title, author, isbn);
+
+    // Instantiate UI
+    const ui = new UI();
+
+    // Validate
+    if(title === '' || author ==='' || isbn === '') {
+        // Error Alert
+        ui.showAlert('Please Fill In All Fields', 'error')
+    } else {
+        // Add Book To List
+        ui.addBookToList(book);
+        // Show Success
+        ui.showAlert('Book Added!', 'success');
+        // Clear Fields
+        ui.clearFields();
+
+        e.preventDefault();
+    }
+})
+
