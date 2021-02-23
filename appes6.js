@@ -15,8 +15,8 @@ class UI {
         // Insert Cols
         row.innerHTML = `
         <td>${book.title}</td>
-        <td>${book.title}</td>
-        <td>${book.title}</td>
+        <td>${book.author}</td>
+        <td>${book.isbn}</td>
         <td><a href="#" class="delete">X<a></td>
         `;
 
@@ -55,6 +55,54 @@ class UI {
     }
 }
 
+// Local Storage Class
+class Store {
+    static getBooks() {
+        let books;
+        if(localStorage.getItem('books') === null) {
+            books = [];
+        } else {
+            books = JSON.parse(localStorage.getItem('books'));
+        }
+
+        return books;
+    }
+
+    static displayBooks() {
+        const books = Store.getBooks();
+
+        books.forEach(function(book) {
+            const ui = new UI;
+
+            // Add Book To UI
+            ui.addBookToList(book);
+        })
+    }
+
+    static addBook(book) {
+        const books = Store.getBooks();
+
+        books.push(book);
+
+        localStorage.setItem('books', JSON.stringify(books));
+    }
+
+    static removeBook(isbn) {
+        const books = Store.getBooks();
+
+        books.forEach(function(book, index) {
+            if(book.isbn === isbn) {
+                books.splice(index, 1);
+            }
+        })
+
+        localStorage.setItem('books', JSON.stringify(books));
+    }
+}
+
+// DOM Load Event
+document.addEventListener('DOMContentLoaded', Store.displayBooks);
+
 // Event Listener To Add Book
 document.getElementById('book-form').addEventListener('submit', function(e) {
     // Get Form Values
@@ -75,6 +123,8 @@ document.getElementById('book-form').addEventListener('submit', function(e) {
     } else {
         // Add Book To List
         ui.addBookToList(book);
+        // Add To Local Storage
+        Store.addBook(book);
         // Show Success
         ui.showAlert('Book Added!', 'success');
         // Clear Fields
@@ -88,8 +138,10 @@ document.getElementById('book-form').addEventListener('submit', function(e) {
 document.getElementById('book-list').addEventListener('click', function(e) {
     // Instantiate UI
     const ui = new UI();
-    // Target Book
+    // Delete Book
     ui.deleteBook(e.target);
+    // Remove From Local Storage
+    Store.removeBook(e.target.parentElement.previousElementSibling.textContent);
     // Show Message
     ui.showAlert('Book Removed!', 'success');
 
